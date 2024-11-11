@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>2D Grid Game</title>
+  <style>
+    #grid-container {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+      width: 500px;
+      height: 500px;
+      border: 1px solid black;
+    }
+
+    .grid-item {
+      border: 1px solid lightgray;
+    }
+
+    .player {
+      background-color: blue;
+      width: 100%;
+      height: 100%;
+    }
+
+    .computer {
+      background-color: red;
+      width: 100%;
+      height: 100%;
+    }
+
+    .coin {
+      background-color: gold;
+      width: 100%;
+      height: 100%;
+    }
+
+    .weapon {
+      background-color: green;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Blind Fighters</h1>
+  <div id="grid-container"></div>
+  <p>Coins: <span id="coins">0</span></p>
+  <button id="attack-btn">Attack</button>
+  <button id="buy-weapon-btn">Buy Weapon (costs 10 coins)</button>
+
+  <script>
+    const gridContainer = document.getElementById('grid-container');
+    const coinsDisplay = document.getElementById('coins');
+    const attackBtn = document.getElementById('attack-btn');
+    const buyWeaponBtn = document.getElementById('buy-weapon-btn');
+
+    let coin = {x: -1, y: -1};
+    let hasWeapon = false;
+
+    let player = {
+        pos: { x: 0, y: 0 },
+        health: 100,
+    };
+
+    let computer = {
+        pos: { x: 9, y: 9 },
+        health: 100,
+    };
+    
+
+    function createGrid() {
+      for (let i = 0; i < 100; i++) {
+        const gridItem = document.createElement('div');
+        gridItem.classList.add('grid-item');
+        gridContainer.appendChild(gridItem);
+      }
+
+      // Place player, computer, and coins
+      updateGrid();
+    }
+
+    function updateGrid() {
+      // Clear previous positions
+      document.querySelectorAll('.player, .computer, .coin, .weapon').forEach(item => item.classList.remove('player', 'computer', 'coin', 'weapon'));
+
+      // Place player
+      const playerGridItem = gridContainer.children[player.pos.y * 10 + player.pos.x];
+      playerGridItem.classList.add('player');
+
+      // Place computer
+      const computerGridItem = gridContainer.children[computer.pos.y * 10 + computer.pos.x];
+      computerGridItem.classList.add('computer');
+
+      // Place coins
+      if (Math.random() < 0.1) {
+        const coinGridItem = gridContainer.children[Math.floor(Math.random() * 100)];
+        coinGridItem.classList.add('coin');
+      }
+
+      coinsDisplay.textContent = coins;
+    }
+
+    function movePlayer(dx, dy) {
+      player.pos.x = Math.max(0, Math.min(9, player.pos.x + dx));
+      player.pos.y = Math.max(0, Math.min(9, player.pos.y + dy));
+      updateGrid();
+    }
+
+    function moveComputer() {
+      const dx = computer.pos.x < player.pos.x ? 1 : (computer.pos.x > player.pos.x ? -1 : 0);
+      const dy = computer.pos.y < player.pos.y ? 1 : (computer.pos.y > player.pos.y ? -1 : 0);
+      computer.pos.x = Math.max(0, Math.min(9, computer.pos.x + dx));
+      computer.pos.y = Math.max(0, Math.min(9, computer.pos.y + dy));
+      updateGrid();
+    }
+
+    function moveBullet() {
+
+    }
+
+    function attack() {
+      if (Math.abs(player.pos.x - computerPos.x) <= 1 && Math.abs(playerPos.y - computerPos.y) <= 1) {
+        // Close-range attack with fists
+        console.log('Player attacks computer with fists');
+      } else if (hasWeapon) {
+        // Ranged attack with weapon
+        console.log('Player attacks computer with weapon');
+        hasWeapon = false;
+      } else {
+        console.log('Player does not have a weapon');
+      }
+    }
+
+    function buyWeapon() {
+      if (coins >= 10) {
+        coins -= 10;
+        hasWeapon = true;
+        updateGrid();
+        console.log('Player bought a weapon');
+      } else {
+        console.log('Not enough coins to buy a weapon');
+      }
+    }
+
+    document.addEventListener('keydown', (event) => {
+      switch (event.key) {
+        case 'ArrowUp':
+        case 'w':
+          movePlayer(0, -1);
+          break;
+        case 'ArrowDown':
+        case 's':
+          movePlayer(0, 1);
+          break;
+        case 'ArrowLeft':
+        case 'a':
+          movePlayer(-1, 0);
+          break;
+        case 'ArrowRight':
+        case 'd':
+          movePlayer(1, 0);
+          break;
+      }
+    });
+
+    attackBtn.addEventListener('click', attack);
+    buyWeaponBtn.addEventListener('click', buyWeapon);
+
+    createGrid();
+    setInterval(moveComputer, 1000);
+  </script>
+</body>
+</html>
